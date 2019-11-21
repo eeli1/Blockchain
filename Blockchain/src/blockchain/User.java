@@ -7,10 +7,25 @@ public class User {
 
 	private KeyPair keyPair;
 	private Blockchain blockchain;
+	private boolean systemUser;
 
 	public User(Blockchain blockchain) throws Exception {
+
+		if (blockchain.getBlocks().size() == 0) {
+			systemUser = true;
+		} else {
+			systemUser = false;
+		}
+
 		keyPair = generateKeyPair();
 		this.blockchain = blockchain;
+	}
+
+	/**
+	 * @return the systemUser
+	 */
+	public boolean isSystemUser() {
+		return systemUser;
 	}
 
 	public User(Blockchain blockchain, KeyPair keyPair) {
@@ -18,8 +33,8 @@ public class User {
 		this.blockchain = blockchain;
 	}
 
-	public void createTransaction(User to, int amount, int gas) throws Exception {
-		Transaction transaction = new Transaction(this, to, amount, gas);
+	public void createTransaction(User to, int amount) throws Exception {
+		Transaction transaction = new Transaction(this, to, amount);
 		transaction.signFrom(this.sign((transaction.toString()), keyPair));
 
 		blockchain.addTransaction(transaction);

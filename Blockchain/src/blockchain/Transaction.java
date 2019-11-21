@@ -5,29 +5,40 @@ import java.util.Base64;
 
 public class Transaction {
 
-	private User from;
-	private User to;
+	private User userFrom;
+	private User userTo;
 	private int amount;
-	private int gas;
 	private String signatureFrom;
 	private String signatureTo;
 
-	public Transaction(User from, User to, int amount, int gas) {
-		this.from = from;
-		this.to = to;
+	public Transaction(User userFrom, User userTo, int amount) {
+		this.userFrom = userFrom;
+		this.userTo = userTo;
 		this.amount = amount;
-		this.gas = gas;
+	}
+
+	public int getBalance(User user) {
+		if (user == userFrom) {
+			return -amount;
+		}
+		if (user == userTo) {
+			return amount;
+		}
+		return 0;
 	}
 
 	public boolean verify() throws Exception {
+		if (userFrom.isSystemUser()) {
+			return true;
+		}
 		if ((signatureFrom == null) || (signatureTo == null)) {
 			return false;
 		}
 
-		if (!verifyUser(("from=" + from + ", to=" + to + ", amount=" + amount + ", gas=" + gas), from, signatureFrom)) {
+		if (!verifyUser((this.toString()), userFrom, signatureFrom)) {
 			return false;
 		}
-		if (!verifyUser(("from=" + from + ", to=" + to + ", amount=" + amount + ", gas=" + gas), to, signatureTo)) {
+		if (!verifyUser((this.toString()), userTo, signatureTo)) {
 			return false;
 		}
 		return true;
@@ -45,7 +56,7 @@ public class Transaction {
 
 	@Override
 	public String toString() {
-		return "from=" + from + ", to=" + to + ", amount=" + amount + ", gas=" + gas;
+		return "userFrom=" + userFrom + ", userTo=" + userTo + ", amount=" + amount;
 	}
 
 	/**
@@ -59,6 +70,9 @@ public class Transaction {
 	 * @param signatureFrom the signatureFrom to set
 	 */
 	public void signFrom(String signatureFrom) {
+		if (this.signatureFrom != null) {
+			throw new IllegalAccessError("signatureFrom has alrady been defind");
+		}
 		this.signatureFrom = signatureFrom;
 	}
 
@@ -73,28 +87,24 @@ public class Transaction {
 	 * @param signatureTo the signatureTo to set
 	 */
 	public void signTo(String signatureTo) {
+		if (this.signatureTo != null) {
+			throw new IllegalAccessError("signatureTo has alrady been defind");
+		}
 		this.signatureTo = signatureTo;
-	}
-
-	/**
-	 * @return the gas
-	 */
-	public int getGas() {
-		return gas;
 	}
 
 	/**
 	 * @return the from
 	 */
-	public User getFrom() {
-		return from;
+	public User getUserFrom() {
+		return userFrom;
 	}
 
 	/**
 	 * @return the to
 	 */
-	public User getTo() {
-		return to;
+	public User getUserTo() {
+		return userTo;
 	}
 
 	/**

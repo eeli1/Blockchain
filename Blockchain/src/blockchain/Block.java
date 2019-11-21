@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class Block {
 
@@ -20,8 +21,42 @@ public class Block {
 		this.previousHash = previousHash;
 	}
 
-	public Block(Transaction[] transaction) {
-		this.transaction = transaction;
+	public Block() { // for genesisBlock
+
+	}
+
+	public int getBalance(User user) {
+		int balance = 0;
+		for (int i = 0; i < transaction.length; i++) {
+			balance += transaction[i].getBalance(user);
+		}
+		return balance;
+	}
+
+	public boolean isValid(Block previousBlock, int dificulty) {
+		if (previousHash != previousBlock.getHash()) {
+			return false;
+		}
+
+		if (greaterThan(this.hash, dificulty)) {
+			return false;
+		}
+
+		for (int i = 0; i < transaction.length; i++) {
+			try {
+				if (transaction[i].verify() == false) {
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean greaterThan(String hash, int dificulty) {
+
 	}
 
 	@Override
@@ -79,12 +114,14 @@ public class Block {
 	 * @throws NoSuchAlgorithmException
 	 */
 	public void calcHash() throws NoSuchAlgorithmException {
-		this.hash = new String(getSHA(this.toString()));
+		this.hash = getSHA(this.toString());
 	}
 
-	private static byte[] getSHA(String input) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		return md.digest(input.getBytes(StandardCharsets.UTF_8));
+	private static String getSHA(String text) throws NoSuchAlgorithmException {
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+		String encoded = Base64.getEncoder().encodeToString(hash);
+		return encoded;
 	}
 
 	/**

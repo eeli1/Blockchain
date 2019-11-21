@@ -4,16 +4,39 @@ import java.util.ArrayList;
 
 public class Blockchain {
 
-	private String dificulty;
+	private int dificulty;
 	private ArrayList<Transaction> miningPool;
-	private ArrayList<Block> blocks;
+	private ArrayList<Block> blockcahin;
+	private int blockReward;
 
-	public Blockchain() {
-		blocks = new ArrayList<Block>();
+	private User systemUser;
+
+	public Blockchain() throws Exception {
+
+		systemUser = new User(this);
+		blockReward = 12;
+
+		blockcahin = new ArrayList<Block>();
 		miningPool = new ArrayList<Transaction>();
-		Transaction[] data = {};
-		Block genesis = new Block(data);
-		blocks.add(genesis);
+		Block genesis = new Block();
+		blockcahin.add(genesis);
+	}
+
+	public boolean isValid() {
+		for (int i = 1; i < blockcahin.size(); i++) {
+			if (blockcahin.get(i).isValid(blockcahin.get(i - 1), dificulty) == false) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public int getBalance(User user) {
+		int balance = 0;
+		for (int i = 0; i < blockcahin.size(); i++) {
+			balance += blockcahin.get(i).getBalance(user);
+		}
+		return balance;
 	}
 
 	public void addTransaction(Transaction transaction) throws Exception {
@@ -27,31 +50,24 @@ public class Blockchain {
 	 * @return the blocks
 	 */
 	public ArrayList<Block> getBlocks() {
-		return blocks;
+		return blockcahin;
 	}
 
-	public Block getLastBlocks() {
-		return blocks.get(blocks.size() - 1);
-	}
-
-	/**
-	 * @param blocks the blocks to set
-	 */
-	public void addBlocks(ArrayList<Block> blocks) {
-		this.blocks = blocks;
+	public Block getLastBlock() {
+		return blockcahin.get(blockcahin.size() - 1);
 	}
 
 	/**
 	 * @return the dificulty
 	 */
-	public String getDificulty() {
+	public int getDificulty() {
 		return dificulty;
 	}
 
 	/**
 	 * @param dificulty the dificulty to set
 	 */
-	public void setDificulty(String dificulty) {
+	public void setDificulty(int dificulty) {
 		this.dificulty = dificulty;
 	}
 
@@ -64,6 +80,18 @@ public class Blockchain {
 
 		}
 		return out;
+	}
+
+	public void addBlock(Block newBlock, User user) {
+		if (newBlock.isValid(this.getLastBlock(), dificulty)) {
+			Transaction t = new Transaction(systemUser, user, blockReward);
+			try {
+				this.addTransaction(t);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 }

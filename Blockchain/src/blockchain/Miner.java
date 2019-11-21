@@ -10,37 +10,33 @@ public class Miner {
 		this.user = user;
 	}
 
-	public Block mine() throws Exception {
-		Block lastBlock = blockchain.getLastBlocks();
+	public void mine() throws Exception {
+		if (blockchain.isValid()) {
+			Block lastBlock = blockchain.getLastBlock();
 
-		Transaction[] miningPool = blockchain.getMiningPool();
-		for (int i = 0; i < miningPool.length; i++) {
-			if (miningPool[i].verify() == false) {
-				throw new IllegalAccessError("miningPool " + i + "  was changed");
+			Transaction[] miningPool = blockchain.getMiningPool();
+			for (int i = 0; i < miningPool.length; i++) {
+				if (miningPool[i].verify() == false) {
+					throw new IllegalAccessError("miningPool " + i + "  was changed");
+				}
 			}
-		}
 
-		Block block = new Block(miningPool, lastBlock.getHash());
+			Block block = new Block(miningPool, lastBlock.getHash());
 
-		block.updataTime();
-		block.calcHash();
-
-		while (greaterThan(blockchain.getDificulty(), block.getHash())) {
-			block.setNonce(block.getNonce() + 1);
 			block.updataTime();
 			block.calcHash();
+
+			while (greaterThan(blockchain.getDificulty(), block.getHash())) {
+				block.setNonce(block.getNonce() + 1);
+				block.updataTime();
+				block.calcHash();
+			}
+			blockchain.addBlock(block, user);
+		} else {
+			throw new IllegalArgumentException("mining on in valid chain");
 		}
-		return block;
 	}
 
-	private boolean greaterThan(String a, String b) {
-		if (a.length() != b.length()) {
-			throw new IllegalArgumentException("the tarays have to be the same size");
-		}
-		for (int i = 0; i < b.length(); i++) {
-
-		}
-		return false;
-	}
+	
 
 }
