@@ -11,7 +11,7 @@ public class User {
 
 	public User(Blockchain blockchain) throws Exception {
 
-		if (blockchain.getBlocks().size() == 0) {
+		if (blockchain.getBlocks() == null) {
 			systemUser = true;
 		} else {
 			systemUser = false;

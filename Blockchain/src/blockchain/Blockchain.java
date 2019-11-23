@@ -1,6 +1,7 @@
 package blockchain;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class Blockchain {
 
@@ -12,6 +13,7 @@ public class Blockchain {
 	private User systemUser;
 
 	public Blockchain() throws Exception {
+		dificulty = 1;
 
 		systemUser = new User(this);
 		blockReward = 12;
@@ -20,6 +22,40 @@ public class Blockchain {
 		miningPool = new ArrayList<Transaction>();
 		Block genesis = new Block();
 		blockcahin.add(genesis);
+
+		Transaction start = new Transaction(systemUser, systemUser, 1);
+		miningPool.add(start);
+	}
+
+	public boolean verifyPool() throws Exception {
+		for (int i = 0; i < miningPool.size(); i++) {
+			if (miningPool.get(i).verify() == false) {
+				throw new Exception("miningPool " + i + "  was changed");
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		String head = "Blockchain [dificulty=" + dificulty + ", blockcahin=" + blockcahin + ", blockReward="
+				+ blockReward + "]";
+		String blocks = "\n";
+		for (int i = 1; i < blockcahin.size(); i++) {
+			blocks += blockcahin.get(i).toString();
+			blocks += "\n";
+		}
+		return head + blocks;
+	}
+
+	public boolean smallEnough(String hash) {
+		byte[] decoded = Base64.getDecoder().decode(hash);
+		for (int i = 0; i < decoded.length - (decoded.length - dificulty); i++) {
+			if (decoded[i] != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isValid() {
@@ -83,6 +119,16 @@ public class Blockchain {
 	}
 
 	public void addBlock(Block newBlock, User user) {
+		if (blockcahin.size() == 1) {
+			Transaction t = new Transaction(systemUser, user, blockReward);
+			try {
+				this.addTransaction(t);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+
 		if (newBlock.isValid(this.getLastBlock(), dificulty)) {
 			Transaction t = new Transaction(systemUser, user, blockReward);
 			try {

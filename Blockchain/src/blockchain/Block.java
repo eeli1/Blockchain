@@ -11,14 +11,16 @@ public class Block {
 
 	private String hash;
 	private String previousHash;
+	private Blockchain blockchain;
 
 	private Transaction[] transaction;
 
 	private LocalDateTime time;
 
-	public Block(Transaction[] transaction, String previousHash) {
+	public Block(Transaction[] transaction, String previousHash, Blockchain blockchain) {
 		this.transaction = transaction;
 		this.previousHash = previousHash;
+		this.blockchain = blockchain;
 	}
 
 	public Block() { // for genesisBlock
@@ -38,7 +40,7 @@ public class Block {
 			return false;
 		}
 
-		if (greaterThan(this.hash, dificulty)) {
+		if (blockchain.smallEnough(hash)) {
 			return false;
 		}
 
@@ -53,10 +55,6 @@ public class Block {
 			}
 		}
 		return true;
-	}
-
-	private boolean greaterThan(String hash, int dificulty) {
-
 	}
 
 	@Override

@@ -11,22 +11,17 @@ public class Miner {
 	}
 
 	public void mine() throws Exception {
-		if (blockchain.isValid()) {
+		if (blockchain.isValid() && blockchain.verifyPool()) {
 			Block lastBlock = blockchain.getLastBlock();
 
 			Transaction[] miningPool = blockchain.getMiningPool();
-			for (int i = 0; i < miningPool.length; i++) {
-				if (miningPool[i].verify() == false) {
-					throw new IllegalAccessError("miningPool " + i + "  was changed");
-				}
-			}
 
-			Block block = new Block(miningPool, lastBlock.getHash());
+			Block block = new Block(miningPool, lastBlock.getHash(), blockchain);
 
 			block.updataTime();
 			block.calcHash();
 
-			while (greaterThan(blockchain.getDificulty(), block.getHash())) {
+			while (blockchain.smallEnough(block.getHash())) {
 				block.setNonce(block.getNonce() + 1);
 				block.updataTime();
 				block.calcHash();
@@ -36,7 +31,5 @@ public class Miner {
 			throw new IllegalArgumentException("mining on in valid chain");
 		}
 	}
-
-	
 
 }
