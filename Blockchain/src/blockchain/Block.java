@@ -16,6 +16,7 @@ public class Block {
 	private Transaction[] transaction;
 
 	private LocalDateTime time;
+	private int nonce;
 
 	public Block(Transaction[] transaction, String previousHash, Blockchain blockchain) {
 		this.transaction = transaction;
@@ -40,7 +41,7 @@ public class Block {
 			return false;
 		}
 
-		if (blockchain.smallEnough(hash)) {
+		if (!blockchain.smallEnough(hash)) {
 			return false;
 		}
 
@@ -59,8 +60,9 @@ public class Block {
 
 	@Override
 	public String toString() {
-		return "Block [hash=" + hash + ", previousHash=" + previousHash + ", transaction="
-				+ Arrays.toString(transaction) + ", time=" + time + ", nonce=" + nonce + "]";
+		return "Block [hash=" + hash + ", previousHash=" + previousHash
+		/* + ", transaction=" + Arrays.toString(transaction) */
+				+ ", time=" + time + ", nonce=" + nonce + "]";
 	}
 
 	/**
@@ -97,8 +99,6 @@ public class Block {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
-
-	private long nonce;
 
 	/**
 	 * @return the hash
@@ -139,14 +139,14 @@ public class Block {
 	/**
 	 * @return the nonce
 	 */
-	public long getNonce() {
+	public int getNonce() {
 		return nonce;
 	}
 
 	/**
 	 * @param nonc the nonce to set
 	 */
-	public void setNonce(long nonce) {
+	public void setNonce(int nonce) {
 		this.nonce = nonce;
 	}
 

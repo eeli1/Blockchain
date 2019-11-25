@@ -23,7 +23,7 @@ public class Blockchain {
 		Block genesis = new Block();
 		blockcahin.add(genesis);
 
-		Transaction start = new Transaction(systemUser, systemUser, 1);
+		Transaction start = new Transaction(this, systemUser, systemUser, 1);
 		miningPool.add(start);
 	}
 
@@ -38,8 +38,7 @@ public class Blockchain {
 
 	@Override
 	public String toString() {
-		String head = "Blockchain [dificulty=" + dificulty + ", blockcahin=" + blockcahin + ", blockReward="
-				+ blockReward + "]";
+		String head = "Blockchain [dificulty=" + dificulty + ", blockReward=" + blockReward + "]";
 		String blocks = "\n";
 		for (int i = 1; i < blockcahin.size(); i++) {
 			blocks += blockcahin.get(i).toString();
@@ -111,16 +110,17 @@ public class Blockchain {
 	 * @return the miningPool
 	 */
 	public Transaction[] getMiningPool() {
-		Transaction[] out = new Transaction[miningPool.size() - 1];
+		Transaction[] out = new Transaction[miningPool.size()];
 		for (int i = 0; i < miningPool.size(); i++) {
-
+			out[i] = miningPool.get(i);
 		}
 		return out;
 	}
 
 	public void addBlock(Block newBlock, User user) {
 		if (blockcahin.size() == 1) {
-			Transaction t = new Transaction(systemUser, user, blockReward);
+			blockcahin.add(newBlock);
+			Transaction t = new Transaction(this, systemUser, user, blockReward);
 			try {
 				this.addTransaction(t);
 			} catch (Exception e) {
@@ -130,7 +130,8 @@ public class Blockchain {
 		}
 
 		if (newBlock.isValid(this.getLastBlock(), dificulty)) {
-			Transaction t = new Transaction(systemUser, user, blockReward);
+			blockcahin.add(newBlock);
+			Transaction t = new Transaction(this, systemUser, user, blockReward);
 			try {
 				this.addTransaction(t);
 			} catch (Exception e) {

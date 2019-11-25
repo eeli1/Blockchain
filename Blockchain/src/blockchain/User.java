@@ -34,8 +34,8 @@ public class User {
 	}
 
 	public void createTransaction(User to, int amount) throws Exception {
-		Transaction transaction = new Transaction(this, to, amount);
-		transaction.signFrom(this.sign((transaction.toString()), keyPair));
+		Transaction transaction = new Transaction(blockchain, this, to, amount);
+		transaction.sign(this.sign((transaction.toString()), keyPair));
 
 		blockchain.addTransaction(transaction);
 	}

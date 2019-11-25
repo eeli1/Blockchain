@@ -1,6 +1,7 @@
 package blockchain;
 
 import java.security.Signature;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 public class Transaction {
@@ -8,13 +9,31 @@ public class Transaction {
 	private User userFrom;
 	private User userTo;
 	private int amount;
-	private String signatureFrom;
-	private String signatureTo;
+	private String signature;
+	private Blockchain blockchain;
+	private int randomNum;
+	private LocalDateTime time;
 
-	public Transaction(User userFrom, User userTo, int amount) {
+	public Transaction(Blockchain blockchain, User userFrom, User userTo, int amount) {
 		this.userFrom = userFrom;
 		this.userTo = userTo;
-		this.amount = amount;
+		if (amount > 0) {
+			this.amount = amount;
+		} else {
+			this.amount = 0;
+		}
+		this.blockchain = blockchain;
+		randomNum = (int) (Math.random() * Math.pow(10, 9));
+		time = LocalDateTime.now();
+
+	}
+
+	public void sign(String signature) throws Exception {
+		this.signature = signature;
+	}
+
+	public int getRandomNum() {
+		return randomNum;
 	}
 
 	public int getBalance(User user) {
@@ -31,14 +50,10 @@ public class Transaction {
 		if (userFrom.isSystemUser()) {
 			return true;
 		}
-		if ((signatureFrom == null) || (signatureTo == null)) {
+		if (signature == null) {
 			return false;
 		}
-
-		if (!verifyUser((this.toString()), userFrom, signatureFrom)) {
-			return false;
-		}
-		if (!verifyUser((this.toString()), userTo, signatureTo)) {
+		if (!verifyUser((this.toString()), userTo, signature)) {
 			return false;
 		}
 		return true;
@@ -56,41 +71,8 @@ public class Transaction {
 
 	@Override
 	public String toString() {
-		return "userFrom=" + userFrom + ", userTo=" + userTo + ", amount=" + amount;
-	}
-
-	/**
-	 * @return the signatureFrom
-	 */
-	public String getSignatureFrom() {
-		return signatureFrom;
-	}
-
-	/**
-	 * @param signatureFrom the signatureFrom to set
-	 */
-	public void signFrom(String signatureFrom) {
-		if (this.signatureFrom != null) {
-			throw new IllegalAccessError("signatureFrom has alrady been defind");
-		}
-		this.signatureFrom = signatureFrom;
-	}
-
-	/**
-	 * @return the signatureTo
-	 */
-	public String getSignatureTo() {
-		return signatureTo;
-	}
-
-	/**
-	 * @param signatureTo the signatureTo to set
-	 */
-	public void signTo(String signatureTo) {
-		if (this.signatureTo != null) {
-			throw new IllegalAccessError("signatureTo has alrady been defind");
-		}
-		this.signatureTo = signatureTo;
+		return "userFrom=" + userFrom.toString() + ", userTo=" + userTo.toString() + ", amount=" + amount + "randomNum="
+				+ randomNum;
 	}
 
 	/**
@@ -98,6 +80,13 @@ public class Transaction {
 	 */
 	public User getUserFrom() {
 		return userFrom;
+	}
+
+	/**
+	 * @return the signature
+	 */
+	public String getSignature() {
+		return signature;
 	}
 
 	/**
@@ -112,6 +101,10 @@ public class Transaction {
 	 */
 	public int getAmount() {
 		return amount;
+	}
+
+	public LocalDateTime getTime() {
+		return time;
 	}
 
 }

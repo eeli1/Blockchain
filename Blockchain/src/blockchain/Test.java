@@ -17,13 +17,14 @@ public class Test {
 
 		User u2 = new User(blockchain);
 
-		Transaction t = new Transaction(u1, u2, 1);
+		Transaction t = new Transaction(blockchain, u1, u2, 1);
 		blockchain.addTransaction(t);
 
 		m1.mine();
 		System.out.println(blockchain);
-		System.out.println(blockchain.getBlocks().size());
 		System.out.println("end");
+
+		// testHash();
 	}
 
 	private static void testHash() {

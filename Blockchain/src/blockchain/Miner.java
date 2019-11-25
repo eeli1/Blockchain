@@ -21,7 +21,7 @@ public class Miner {
 			block.updataTime();
 			block.calcHash();
 
-			while (blockchain.smallEnough(block.getHash())) {
+			while (!blockchain.smallEnough(block.getHash())) {
 				block.setNonce(block.getNonce() + 1);
 				block.updataTime();
 				block.calcHash();
